@@ -1,9 +1,9 @@
 # Neural-Style-Transfer
 # To-do List
 
-## Experiment with Hyperparameters in the Original Method
+## Experiment with Hyperparameters in the Original Method and other Improvemnents
 - Change the layers and layers' weights and observe the effects.
-- Adjust the content/style weights (alpha/beta), and experiment with Patch-based Style loss.
+- Adjust the content/style weights (alpha/beta), may be try Patch-based Style loss.
 - Modify the initialization, for example:
     - White noise
     - Content image
