@@ -73,7 +73,7 @@ class StyleTransfer:
 
         return model, style_losses, content_losses
 
-    def run_style_transfer(self, content_img_path, style_img_path, initialization=DEFAULT_INITIALIZATION, num_steps=DEFAULT_NUM_STEPS, alpha=DEFAULT_ALPHA, beta=DEFAULT_BETA):
+    def run_style_transfer(self, content_img_path, style_img_path, initialization=DEFAULT_INITIALIZATION, num_steps=DEFAULT_NUM_STEPS, alpha=DEFAULT_ALPHA, beta=DEFAULT_BETA, preserve_color = DEFAULT_PRESERVE_COLOR):
         content_img = image_loader(content_img_path)
         style_img = image_loader(style_img_path)
         print(style_img.size(), content_img.size())
