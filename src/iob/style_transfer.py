@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.models as models
-from .utils import image_loader, imshow
+from .utils import image_loader, image_unloader, preserve_color_lab, preserve_color_ycbcr
 from .layers import ContentLoss, StyleLoss, Normalization
 from .config import *
 import copy
@@ -10,10 +10,11 @@ import copy
 class StyleTransfer:
     def __init__(self, content_layers = DEFAULT_CONTENT_LAYERS, style_layers = DEFAULT_STYLE_LAYERS, content_weights = DEFAULT_CONTENT_WEIGHTS, style_weights = DEFAULT_STYLE_WEIGHTS, optimizer = DEFAULT_OPTIMIZER):
         self.device = device
+        # Currently only support VGG19
         self.cnn = copy.deepcopy(models.vgg19(pretrained=True).features.to(self.device).eval())
         self.cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(self.device)
         self.cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(self.device)
-        # You can define content and style layers here
+        # Define content and style layers here
         self.content_layers = content_layers
         self.style_layers = style_layers        
         self.content_weights = content_weights
@@ -21,7 +22,6 @@ class StyleTransfer:
         self.optimizer = optimizer
         
     def get_style_model_and_losses(self, style_img, content_img):
-
         # Normalization module
         normalization = Normalization(self.cnn_normalization_mean, self.cnn_normalization_std).to(device)
 
@@ -73,9 +73,40 @@ class StyleTransfer:
 
         return model, style_losses, content_losses
 
-    def run_style_transfer(self, content_img_path, style_img_path, initialization=DEFAULT_INITIALIZATION, num_steps=DEFAULT_NUM_STEPS, alpha=DEFAULT_ALPHA, beta=DEFAULT_BETA, preserve_color = DEFAULT_PRESERVE_COLOR):
-        content_img = image_loader(content_img_path)
-        style_img = image_loader(style_img_path)
+    def get_optimizer(self, input_img, learning_rate=None):
+        if learning_rate is None:
+            if self.optimizer == 'lbfgs':
+                learning_rate = 0.1
+            elif self.optimizer == 'adam':
+                learning_rate = 0.01
+            elif self.optimizer == 'sgd':
+                learning_rate = 0.01
+
+        if self.optimizer == 'lbfgs':
+            optimizer = optim.LBFGS([input_img], lr=learning_rate)
+        elif self.optimizer == 'adam':
+            optimizer = optim.Adam([input_img], lr=learning_rate)
+        elif self.optimizer == 'sgd':
+            optimizer = optim.SGD([input_img], lr=learning_rate)
+
+        return optimizer
+
+    def run_style_transfer(self, content_img_path, style_img_path, imsize = DEFAULT_IMSIZE, initialization=DEFAULT_INITIALIZATION, num_steps=DEFAULT_NUM_STEPS, alpha=DEFAULT_ALPHA, beta=DEFAULT_BETA, preserve_color = DEFAULT_PRESERVE_COLOR, return_tensor = DEFAULT_RETURN_TENSOR):
+        '''
+        content_img_path: Path to the content image
+        style_img_path: Path to the style image
+        initialization (str): 'content' or 'random'
+        num_steps (int): Number of optimization steps
+        alpha (float): Content weight
+        beta (float): Style weight
+        preserve_color (bool): Preserve color of content image
+        return_tensor (bool): Return tensor instead of PIL image
+
+        return: PIL image or tensor
+        '''
+
+        content_img = image_loader(content_img_path, imsize)
+        style_img = image_loader(style_img_path, imsize)
         print(style_img.size(), content_img.size())
         assert style_img.size() == content_img.size(), \
             "Style and content images must be the same size"
@@ -86,12 +117,7 @@ class StyleTransfer:
         input_img.requires_grad_(True)
         model, style_losses, content_losses = self.get_style_model_and_losses(style_img, content_img)
         
-        if self.optimizer == 'lbfgs':
-            optimizer = optim.LBFGS([input_img], lr = 0.1)
-        elif self.optimizer == 'adam':
-            optimizer = optim.Adam([input_img], lr=0.01)
-        elif self.optimizer == 'sgd':
-            optimizer = optim.SGD([input_img], lr=0.01)
+        optimizer = self.get_optimizer(input_img)
         
         print('Optimizing...')
         run = [0]
@@ -126,4 +152,10 @@ class StyleTransfer:
 
         # Clamp the final output image
         input_img.data.clamp_(0, 1)
+        if preserve_color:
+            input_img = preserve_color_lab(content_img, input_img)
+
+        if not return_tensor:
+            input_img = image_unloader(input_img)
+
         return input_img
