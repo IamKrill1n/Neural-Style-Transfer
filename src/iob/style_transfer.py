@@ -91,12 +91,14 @@ class StyleTransfer:
 
         return optimizer
 
-    def run_style_transfer(self, content_img_path, style_img_path, imsize = DEFAULT_IMSIZE, initialization=DEFAULT_INITIALIZATION, num_steps=DEFAULT_NUM_STEPS, alpha=DEFAULT_ALPHA, beta=DEFAULT_BETA, preserve_color = DEFAULT_PRESERVE_COLOR, return_tensor = DEFAULT_RETURN_TENSOR):
+    def run_style_transfer(self, content_img_path, style_img_path, imsize = DEFAULT_IMSIZE, initialization=DEFAULT_INITIALIZATION, num_steps=DEFAULT_NUM_STEPS, lr = None, alpha=DEFAULT_ALPHA, beta=DEFAULT_BETA, preserve_color = DEFAULT_PRESERVE_COLOR, return_tensor = DEFAULT_RETURN_TENSOR):
         '''
         content_img_path: Path to the content image
         style_img_path: Path to the style image
+        imsize (int or tuple): Size of the output image
         initialization (str): 'content' or 'random'
         num_steps (int): Number of optimization steps
+        lr (float): Learning rate of the optimizer
         alpha (float): Content weight
         beta (float): Style weight
         preserve_color (bool): Preserve color of content image
@@ -117,7 +119,7 @@ class StyleTransfer:
         input_img.requires_grad_(True)
         model, style_losses, content_losses = self.get_style_model_and_losses(style_img, content_img)
         
-        optimizer = self.get_optimizer(input_img)
+        optimizer = self.get_optimizer(input_img, lr)
         
         print('Optimizing...')
         run = [0]
