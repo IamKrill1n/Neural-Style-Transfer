@@ -1,7 +1,7 @@
 import torch 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-DEFAULT_IMSIZE = (512, 512) if torch.cuda.is_available() else (128, 128)
+DEFAULT_IMSIZE = 512 if torch.cuda.is_available() else 128
 DEFAULT_CONTENT_LAYERS = ['conv_4']
 DEFAULT_STYLE_LAYERS = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 # DEFAULT_CONTENT_LAYERS = ['relu_4']

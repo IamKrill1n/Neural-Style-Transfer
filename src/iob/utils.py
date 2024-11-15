@@ -3,15 +3,24 @@ from PIL import Image
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 from .config import *
+import os
 
 unloader = transforms.ToPILImage()
 
 def image_loader(image_path, imsize=DEFAULT_IMSIZE):
+    if not os.path.exists(image_path):
+        raise FileNotFoundError(f"Image file not found: {image_path}")
+    image = Image.open(image_path).convert('RGB')
+    
+    if isinstance(imsize, int):
+        width, height = image.size
+        width *= imsize / height
+        imsize = (imsize, int(width))
+
     loader = transforms.Compose([
         transforms.Resize(imsize),
         transforms.ToTensor()
     ])
-    image = Image.open(image_path).convert('RGB')
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)
 

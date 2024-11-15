@@ -106,7 +106,7 @@ class StyleTransfer:
         '''
 
         content_img = image_loader(content_img_path, imsize)
-        style_img = image_loader(style_img_path, imsize)
+        style_img = image_loader(style_img_path, content_img.shape[2:])
         print(style_img.size(), content_img.size())
         assert style_img.size() == content_img.size(), \
             "Style and content images must be the same size"
