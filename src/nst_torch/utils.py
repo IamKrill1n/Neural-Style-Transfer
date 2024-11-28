@@ -7,7 +7,7 @@ import os
 
 unloader = transforms.ToPILImage()
 
-def image_loader(image_path, imsize=DEFAULT_IMSIZE):
+def image_loader(image_path, imsize=DEFAULT_IMSIZE, device = device):
     if not os.path.exists(image_path):
         raise FileNotFoundError(f"Image file not found: {image_path}")
     image = Image.open(image_path).convert('RGB')
@@ -19,7 +19,7 @@ def image_loader(image_path, imsize=DEFAULT_IMSIZE):
 
     loader = transforms.Compose([
         transforms.Resize(imsize),
-        transforms.ToTensor()
+        transforms.ToTensor(),
     ])
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)

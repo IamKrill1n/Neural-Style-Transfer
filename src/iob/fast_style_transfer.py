@@ -1,2 +1,0 @@
-# https://github.com/gordicaleksa/pytorch-neural-style-transfer/blob/master/neural_style_transfer.py
-# https://github.com/gordicaleksa/pytorch-neural-style-transfer-johnson/blob/master/models/definitions/transformer_net.py
