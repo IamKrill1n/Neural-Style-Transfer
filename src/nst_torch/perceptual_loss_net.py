@@ -41,6 +41,14 @@ class Vgg16(torch.nn.Module):
     
 class Vgg19(Vgg16):
     def __init__(self, content_layers=DEFAULT_CONTENT_LAYERS, style_layers=DEFAULT_STYLE_LAYERS, requires_grad=False):
-        super(Vgg19, self).__init__(content_layers, style_layers, requires_grad)
+        super(Vgg19, self).__init__()
         self.vgg_pretrained_features = models.vgg19(weights=models.VGG19_Weights.IMAGENET1K_V1).eval().features
+        self.content_layers = content_layers
+        self.style_layers = style_layers
+        self.selected_layers = sorted(set(self.content_layers + self.style_layers))
         self.layer_mapping = vgg19_layers_mapping
+        self.selected_indices = [self.layer_mapping[name] for name in self.selected_layers]
+        self.index_mapping = {idx: name for name, idx in self.layer_mapping.items()}
+        if not requires_grad:
+            for param in self.parameters():
+                param.requires_grad = False
