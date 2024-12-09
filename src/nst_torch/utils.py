@@ -2,6 +2,7 @@ import torch
 from PIL import Image
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
+from torch.utils.data import Dataset, DataLoader
 from .config import *
 import os
 
@@ -35,6 +36,29 @@ def imshow(tensor, title=None):
     if title:
         plt.title(title)
     plt.pause(0.001)
+
+class ContentImageDataset(Dataset):
+    def __init__(self, content_dir, imsize=DEFAULT_IMSIZE):
+        self.content_dir = content_dir
+        self.image_files = [
+            os.path.join(content_dir, fname)
+            for fname in os.listdir(content_dir)
+            if fname.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.png'))
+        ]
+        self.imsize = imsize
+
+    def __len__(self):
+        return len(self.image_files)
+
+    def __getitem__(self, idx):
+        img_path = self.image_files[idx]
+        image = image_loader(img_path, self.imsize, device = 'cpu').squeeze(0)
+        return image
+
+def get_content_loader(content_dir, imsize=DEFAULT_IMSIZE, batch_size=4, shuffle=True):
+    dataset = ContentImageDataset(content_dir, imsize=imsize)
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
+    return loader
 
 def preserve_color_lab(content_tensor, output_tensor):
     # Input 2 tensors and return a tensor
@@ -77,3 +101,13 @@ def preserve_color_ycbcr(content_tensor, output_tensor):
     ])
     result = loader(result_ycbcr).unsqueeze(0).to(device)
     return result
+
+# if __name__ == '__main__':
+#     content_dir = 'wikiart/'
+#     loader = get_content_loader(content_dir, batch_size=4, shuffle=True, imsize=DEFAULT_IMSIZE, device=device)
+#     for batch_id, content_batch in enumerate(loader):
+#         print(f"Batch {batch_id}: {content_batch.shape}")
+#         imshow(content_batch[0], title='Content Image')
+#         if batch_id == 0:
+#             break
+#     plt.show()

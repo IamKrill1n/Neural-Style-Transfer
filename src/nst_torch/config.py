@@ -3,6 +3,7 @@ import torch
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DEFAULT_CNN = 'vgg19'
 DEFAULT_IMSIZE = 512 if torch.cuda.is_available() else 128
+DEFAULT_TRAIN_IMSIZE = (256, 256)
 DEFAULT_CONTENT_LAYERS = ['conv4_1']
 DEFAULT_STYLE_LAYERS = ['conv1_1', 'conv2_1', 'conv3_1', 'conv4_1', 'conv5_1']
 # DEFAULT_CONTENT_LAYERS = ['relu4_1']
@@ -15,8 +16,13 @@ DEFAULT_ALPHA = 1
 DEFAULT_BETA = 1e7
 DEFAULT_TV_WEIGHT = 0
 DEFAULT_OPTIMIZER = 'lbfgs'
+DEFAULT_FAST_OPTIMIZER = 'adam'
 DEFAULT_PRESERVE_COLOR = False
 DEFAULT_RETURN_TENSOR = False
+DEFAULT_BATCH_SIZE = 4
+DEFAULT_LEARNING_RATE = 0.01
+DEFAULT_LOG_INTERVAL = 500
+DEFAULT_CHECKPOINT_DIR = 'checkpoints/'
 vgg16_layers_mapping = {
     'conv1_1': 0,
     'relu1_1': 1,

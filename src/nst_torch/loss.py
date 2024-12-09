@@ -8,10 +8,10 @@ def content_loss(input, target):
     
 def gram_matrix(input):
     batch_size, feature_maps, h, w = input.size()
-    features = input.view(batch_size * feature_maps, h * w)
-    G = torch.mm(features, features.t())
+    features = input.view(batch_size, feature_maps, h * w)
+    G = torch.bmm(features, features.transpose(1, 2))
     # Normalize the Gram Matrix
-    return G.div(batch_size * feature_maps * h * w)
+    return G.div(feature_maps * h * w)
 
 def style_loss(input, target):
     G_input = gram_matrix(input)
