@@ -17,7 +17,7 @@ class StyleTransfer:
         elif cnn == 'vgg16':
             self.cnn = Vgg16(content_layers=self.content_layers, style_layers=self.style_layers).to(self.device)
         else:
-            raise ValueError("Only VGG19 and VGG16 are supported")  
+            raise ValueError(str(cnn) + " is not supported. Only 'vgg19' and 'vgg16' are supported")  
         self.content_weights = content_weights
         self.style_weights = style_weights
         self.optimizer = optimizer
@@ -42,7 +42,7 @@ class StyleTransfer:
         
         return optimizer
 
-    def stylize(self, content_img_path, style_img_path, imsize = DEFAULT_IMSIZE, initialization=DEFAULT_INITIALIZATION, num_steps=DEFAULT_NUM_STEPS, lr = None, alpha=DEFAULT_ALPHA, beta=DEFAULT_BETA, tv_weight = DEFAULT_TV_WEIGHT, preserve_color = DEFAULT_PRESERVE_COLOR, return_tensor = DEFAULT_RETURN_TENSOR):
+    def stylize(self, content_img_path, style_img_path, imsize = DEFAULT_IMSIZE, initialization=DEFAULT_INITIALIZATION, num_steps=DEFAULT_NUM_STEPS, learning_rate = None, alpha=DEFAULT_ALPHA, beta=DEFAULT_BETA, tv_weight = DEFAULT_TV_WEIGHT, preserve_color = DEFAULT_PRESERVE_COLOR, return_tensor = DEFAULT_RETURN_TENSOR):
         '''
         content_img_path: Path to the content image
         style_img_path: Path to the style image
@@ -71,7 +71,7 @@ class StyleTransfer:
         input_img.requires_grad_(True)
         
         
-        optimizer = self.get_optimizer(input_img, lr)
+        optimizer = self.get_optimizer(input_img, learning_rate=learning_rate)
         content_target = self.cnn(content_img)
         style_target = self.cnn(style_img)
 
