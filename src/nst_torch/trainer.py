@@ -6,7 +6,7 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 
 from .config import *
-from .loss import content_loss, style_loss, total_variation_loss
+from .loss import content_loss, style_loss, total_variation_loss, gram_matrix
 from .utils import image_loader, image_unloader, get_content_loader, imshow, preserve_color_lab
 from .transformer_net import TransformerNet
 from .perceptual_loss_net import Vgg16, Vgg19
@@ -32,10 +32,13 @@ class FastStyleTransferTrainer(StyleTransfer):
         # Load images
         train_loader = get_content_loader(content_image_path, batch_size=batch_size, imsize=imsize)
         style_image = image_loader(style_image_path, imsize=imsize).to(self.device)
-        style_image = style_image.repeat(batch_size, 1, 1, 1) # Repeat style image for batch size
+        # Compute style features without repeating
+        with torch.no_grad():
+            style_features = self.cnn(style_image)
+            # Compute Gram matrices for style features
+            style_grams = {layer: gram_matrix(style_features[layer]) for layer in self.style_layers}
         # Define optimizer
         optimizer = self.get_optimizer(self.transformer, learning_rate)
-        style_features = self.cnn(style_image)
         
         for e in range(epochs):
             agg_content_loss = 0.
@@ -60,7 +63,17 @@ class FastStyleTransferTrainer(StyleTransfer):
                 
                 # Compute style loss
                 for layer, weight in zip(self.style_layers, self.style_weights):
-                    style_score += weight * style_loss(stylized_batch_features[layer], style_features[layer].detach())
+                    # Compute Gram matrix of the stylized features
+                    stylized_gram = gram_matrix(stylized_batch_features[layer])
+
+                    # Expand the style Gram matrix to match batch size
+                    style_gram = style_grams[layer]
+                    style_gram_batch = style_gram.unsqueeze(0).expand(stylized_gram.size(0), -1, -1)
+
+                    # Compute style loss between the Gram matrices
+                    style_score += weight * style_loss(
+                        stylized_gram, style_gram_batch.detach()
+                    )
 
                 loss = alpha * content_score + beta * style_score + tv_weight * total_variation_loss(stylized_batch)
                 loss.backward()
