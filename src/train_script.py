@@ -63,7 +63,9 @@ def train(args):
 
     features_style = vgg(utils.normalize_batch(style))
     gram_style = [utils.gram_matrix(y) for y in features_style]
-
+    
+    print("Training starts")
+    
     for e in range(args.epochs):
         transformer.train()
         agg_content_loss = 0.

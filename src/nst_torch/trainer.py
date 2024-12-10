@@ -17,82 +17,97 @@ class FastStyleTransferTrainer(StyleTransfer):
         super().__init__(cnn, content_layers, style_layers, content_weights, style_weights, optimizer)
         self.transformer = TransformerNet().to(self.device)
 
-    def get_optimizer(self, model, learning_rate):
+    def get_optimizer(self, optimizer, learning_rate):
         if learning_rate is None:
             learning_rate = DEFAULT_LEARNING_RATE
-        if self.optimizer == 'adam':
-            return optim.Adam(model.parameters(), lr=learning_rate)
-        elif self.optimizer == 'sgd':
-            return optim.SGD(model.parameters(), lr=learning_rate)
-        else:
-            raise ValueError(f"Invalid optimizer: {self.optimizer}")
 
-    def train(self, style_image_path, content_image_path, imsize = DEFAULT_TRAIN_IMSIZE, alpha = DEFAULT_ALPHA, beta = DEFAULT_BETA, tv_weight = DEFAULT_TV_WEIGHT, epochs=2, batch_size=4, learning_rate=None, checkpoint_path=None):
-        self.transformer.train()
-        # Load images
-        train_loader = get_content_loader(content_image_path, batch_size=batch_size, imsize=imsize)
-        style_image = image_loader(style_image_path, imsize=imsize).to(self.device)
-        # Compute style features without repeating
-        with torch.no_grad():
-            style_features = self.cnn(style_image)
-            # Compute Gram matrices for style features
-            style_grams = {layer: gram_matrix(style_features[layer]) for layer in self.style_layers}
-        # Define optimizer
-        optimizer = self.get_optimizer(self.transformer, learning_rate)
+        if optimizer == 'adam':
+            return optim.Adam(self.transformer.parameters(), lr=learning_rate)
+        elif optimizer == 'sgd':
+            return optim.SGD(self.transformer.parameters(), lr=learning_rate)
+        else:
+            raise ValueError(f"Invalid optimizer: {optimizer}") 
+
+    def train(self, style_image_path, content_image_path, imsize = DEFAULT_TRAIN_IMSIZE, 
+            alpha = DEFAULT_ALPHA, 
+            beta = DEFAULT_BETA, 
+            tv_weight = DEFAULT_TV_WEIGHT, 
+            epochs=2, 
+            batch_size=4, 
+            learning_rate=None, 
+            checkpoint_path=None,
+            model_path=None,
+            log_interval=500,
+            checkpoint_interval=2000):
         
+        self.transformer.train()
+        # Get style features and gram matrixes
+        style_image = image_loader(style_image_path, imsize=imsize).to(self.device)
+        style = style_image.repeat(batch_size, 1, 1, 1).to(device)
+        features_style = self.cnn(style)
+        gram_style = [gram_matrix(features_style[layer]) for layer in self.style_layers]
+
+        # Get content loader  
+        train_loader = get_content_loader(content_image_path, imsize, batch_size)
+        
+        # Get optmizier
+        optimizer = self.get_optimizer(self.optimizer, learning_rate)
+
         for e in range(epochs):
             agg_content_loss = 0.
             agg_style_loss = 0.
             count = 0
-            for batch_id, content_batch in enumerate(train_loader):
-                count += len(content_batch)
+            for batch_id, (x, _) in enumerate(train_loader):
+                n_batch = len(x)
+                count += n_batch
                 optimizer.zero_grad()
+
+                x = x.to(device)
+                y = self.transformer(x)
+
+                features_y = self.cnn(y)
+                features_x = self.cnn(x)
+
                 content_score = 0.
-                style_score = 0.
-                
-                content_batch = content_batch.to(self.device)
-                # Stylized image using transformer network
-                stylized_batch = self.transformer(content_batch)
-                # Extract features from perceptual loss network
-                content_batch_features = self.cnn(content_batch)
-                stylized_batch_features = self.cnn(stylized_batch)
-
-                # Compute content loss
                 for layer, weight in zip(self.content_layers, self.content_weights):
-                    content_score += weight * content_loss(stylized_batch_features[layer], content_batch_features[layer].detach())
-                
-                # Compute style loss
-                for layer, weight in zip(self.style_layers, self.style_weights):
-                    # Compute Gram matrix of the stylized features
-                    stylized_gram = gram_matrix(stylized_batch_features[layer])
+                    content_score += weight * content_loss(features_y[layer], features_x[layer].detach())
 
-                    # Expand the style Gram matrix to match batch size
-                    style_gram = style_grams[layer]
-                    style_gram_batch = style_gram.unsqueeze(0).expand(stylized_gram.size(0), -1, -1)
+                style_score = 0.
+                for layer, weight, gm_s in zip(self.style_layers, self.style_weights, gram_style):
+                    gm_y = gram_matrix(features_y[layer])
+                    style_score += weight * content_loss(gm_y, gm_s[:n_batch, :, :])
 
-                    # Compute style loss between the Gram matrices
-                    style_score += weight * style_loss(
-                        stylized_gram, style_gram_batch.detach()
-                    )
-
-                loss = alpha * content_score + beta * style_score + tv_weight * total_variation_loss(stylized_batch)
-                loss.backward()
+                total_loss = alpha * content_score + beta * style_score + tv_weight * total_variation_loss(y)
+                total_loss.backward()
                 optimizer.step()
 
                 agg_content_loss += content_score.item()
                 agg_style_loss += style_score.item()
-                
-            
-            print(f"Epoch {e+1}/{epochs}, Content Loss: {agg_content_loss/count}, Style Loss: {agg_style_loss/count}")
 
-            if checkpoint_path is not None:
-                if not os.path.exists(checkpoint_path):
-                    os.makedirs(checkpoint_path)
-                transformer_cpu = self.transformer.to('cpu').eval()
-                ckpt_model_filename = f"ckpt_epoch_{e}.pth"
-                ckpt_model_path = os.path.join(checkpoint_path, ckpt_model_filename)
-                torch.save(transformer_cpu.state_dict(), ckpt_model_path)
-                self.transformer.to(self.device).train()
+                if (batch_id + 1) % log_interval == 0:
+                    mesg = "{}\tEpoch {}:\t[{}/{}]\tcontent: {:.6f}\tstyle: {:.6f}\ttotal: {:.6f}".format(
+                        time.ctime(), e + 1, count, len(train_loader.dataset),
+                                    agg_content_loss / (batch_id + 1),
+                                    agg_style_loss / (batch_id + 1),
+                                    (agg_content_loss + agg_style_loss) / (batch_id + 1)
+                    )
+                    print(mesg)
+
+                if checkpoint_path is not None and (batch_id + 1) % checkpoint_interval == 0:
+                    self.transformer.eval().cpu()
+                    ckpt_model_filename = "ckpt_epoch_" + str(e) + "_batch_id_" + str(batch_id + 1) + ".pth"
+                    ckpt_model_path = os.path.join(checkpoint_path, ckpt_model_filename)
+                    torch.save(self.transformer.state_dict(), ckpt_model_path)
+                    self.transformer.to(device).train()
+
+        # save model
+        self.transformer.eval().cpu()
+        save_model_filename = "epoch_" + str(epochs) + ".model"
+        save_model_path = os.path.join(model_path, save_model_filename)
+        torch.save(self.transformer.state_dict(), save_model_path)
+
+        print("\nDone, trained model saved at", save_model_path)
+
         
 
     def stylize(self, content_image, preserve_color = False, return_tensor=True):

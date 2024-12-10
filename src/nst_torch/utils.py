@@ -1,6 +1,6 @@
 import torch
 from PIL import Image
-import torchvision.transforms as transforms
+from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 from .config import *
@@ -68,28 +68,16 @@ def imshow(tensor, title=None):
         plt.title(title)
     plt.pause(0.001)
 
-class ContentImageDataset(Dataset):
-    def __init__(self, content_dir, imsize=DEFAULT_IMSIZE):
-        self.content_dir = content_dir
-        self.image_files = [
-            os.path.join(content_dir, fname)
-            for fname in os.listdir(content_dir)
-            if fname.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.png'))
-        ]
-        self.imsize = imsize
-
-    def __len__(self):
-        return len(self.image_files)
-
-    def __getitem__(self, idx):
-        img_path = self.image_files[idx]
-        image = image_loader(img_path, self.imsize, device = 'cpu').squeeze(0)
-        return image
-
-def get_content_loader(content_dir, imsize=DEFAULT_IMSIZE, batch_size=4, shuffle=True):
-    dataset = ContentImageDataset(content_dir, imsize=imsize)
-    loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
-    return loader
+def get_content_loader(content_dir, imsize=DEFAULT_IMSIZE, batch_size=4):
+    transform = transforms.Compose([
+        transforms.Resize(imsize),
+        transforms.CenterCrop(imsize),
+        transforms.ToTensor(),
+        transforms.Lambda(lambda x: x.mul(255))
+    ])
+    train_dataset = datasets.ImageFolder(content_dir, transform)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size)
+    return train_loader
 
 def preserve_color_lab(content_tensor, output_tensor):
     # Input 2 tensors and return a tensor

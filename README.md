@@ -29,8 +29,14 @@ data/wikiart/
 
 To train the model, use the following command:
 
+GPU:
 ```bash
 python src/train_script.py train --dataset data --save-model-dir model --checkpoint-model-dir checkpoints --cuda 1
+```
+
+CPU:
+```bash
+python src/train_script.py train --dataset data --save-model-dir model --checkpoint-model-dir checkpoints --cuda 0
 ```
 
 ### Inference

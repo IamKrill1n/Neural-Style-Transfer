@@ -164,3 +164,4 @@ cython_debug/
 # Big Files
 wikiart/
 checkpoints/
+*.pth
