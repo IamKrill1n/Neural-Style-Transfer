@@ -20,9 +20,9 @@ class FastStyleTransferTrainer(StyleTransfer):
     def get_optimizer(self, optimizer, learning_rate):
         if learning_rate is None:
             if self.optimizer == 'adam':
-                learning_rate = 0.01
+                learning_rate = 0.005
             elif self.optimizer == 'sgd':
-                learning_rate = 0.01
+                learning_rate = 0.005
 
         if optimizer == 'adam':
             return optim.Adam(self.transformer.parameters(), lr=learning_rate)
@@ -48,14 +48,14 @@ class FastStyleTransferTrainer(StyleTransfer):
         style_image = image_loader(style_image_path, imsize=imsize).to(self.device)
         style = style_image.repeat(batch_size, 1, 1, 1).to(device)
         features_style = self.cnn(style)
-        gram_style = [gram_matrix(features_style[layer]) for layer in self.style_layers]
+        gram_style = [gram_matrix(features_style[layer].detach()) for layer in self.style_layers]
 
         # Get content loader  
         train_loader = get_content_loader(content_image_path, imsize, batch_size)
         
         # Get optmizier
         optimizer = self.get_optimizer(self.optimizer, learning_rate)
-
+        print("Training starts...")
         for e in range(epochs):
             agg_content_loss = 0.
             agg_style_loss = 0.

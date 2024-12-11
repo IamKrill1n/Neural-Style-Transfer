@@ -73,7 +73,7 @@ def get_content_loader(content_dir, imsize=DEFAULT_IMSIZE, batch_size=4):
         transforms.Resize(imsize),
         transforms.CenterCrop(imsize),
         transforms.ToTensor(),
-        transforms.Lambda(lambda x: x.mul(255))
+        # transforms.Lambda(lambda x: x.mul(255))
     ])
     train_dataset = datasets.ImageFolder(content_dir, transform)
     train_loader = DataLoader(train_dataset, batch_size=batch_size)
