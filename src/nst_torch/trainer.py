@@ -19,7 +19,10 @@ class FastStyleTransferTrainer(StyleTransfer):
 
     def get_optimizer(self, optimizer, learning_rate):
         if learning_rate is None:
-            learning_rate = DEFAULT_LEARNING_RATE
+            if self.optimizer == 'adam':
+                learning_rate = 0.01
+            elif self.optimizer == 'sgd':
+                learning_rate = 0.01
 
         if optimizer == 'adam':
             return optim.Adam(self.transformer.parameters(), lr=learning_rate)

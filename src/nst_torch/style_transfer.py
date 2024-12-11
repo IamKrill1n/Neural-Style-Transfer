@@ -25,7 +25,7 @@ class StyleTransfer:
     def get_optimizer(self, input_img, learning_rate=None):
         if learning_rate is None:
             if self.optimizer == 'lbfgs':
-                learning_rate = 0.1
+                learning_rate = 1
             elif self.optimizer == 'adam':
                 learning_rate = 0.01
             elif self.optimizer == 'sgd':
@@ -61,7 +61,7 @@ class StyleTransfer:
 
         content_img = image_loader(content_img_path, imsize)
         style_img = image_loader(style_img_path, content_img.shape[2:])
-        print(style_img.size(), content_img.size())
+        # print(style_img.size(), content_img.size())
         assert style_img.size() == content_img.size(), \
             "Style and content images must be the same size"
         if initialization == 'random':

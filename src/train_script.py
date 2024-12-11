@@ -250,8 +250,8 @@ def main():
     if args.subcommand == "train":
         check_paths(args)
         train(args)
-    else:
-        stylize(args)
+    # else:
+    #     stylize(args)
 
 
 if __name__ == "__main__":
