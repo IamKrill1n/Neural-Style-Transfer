@@ -21,9 +21,8 @@ class FastStyleTransfer:
         with torch.no_grad():
             content_image = content_image.to(self.device)
             stylized_image = self.transformer(content_image)
-            stylized_image.clamp_(0, 255)
-            if stylized_image.max() > 1:
-                stylized_image = stylized_image / 255.0
+            if stylized_image.max() > 100:
+                stylized_image = stylized_image/ 255.0
 
         if preserve_color:
             stylized_image  = preserve_color_lab(content_image, stylized_image)
