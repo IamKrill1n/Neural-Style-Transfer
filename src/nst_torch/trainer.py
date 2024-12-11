@@ -111,11 +111,12 @@ class FastStyleTransferTrainer(StyleTransfer):
         
 
     def stylize(self, content_image, preserve_color = False, return_tensor=True):
-        self.transformer.eval()
+        self.transformer.to(self.device).eval()
         with torch.no_grad():
             content_image = content_image.to(self.device)
             stylized_image = self.transformer(content_image)
-            stylized_image.data.clamp_(0, 1)
+            if stylized_image.max() > 1:
+                stylized_image = stylized_image/ 255.0
 
         if preserve_color:
             stylized_image  = preserve_color_lab(content_image, stylized_image)
