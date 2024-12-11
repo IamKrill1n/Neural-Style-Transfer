@@ -1,10 +1,15 @@
 # Neural-Style-Transfer
 
 ## Original NST
+You can check out the file `src/original_style_transfer.ipynb` for example usage or use the Python script `src/original_style_transfer.py`:
 
-
+```bash
+python src/original_style_transfer.py --content_img_path <path_to_content_image> --style_img_path <path_to_style_image> --output_img_path <path_to_output_image>
+```
 
 ## Fast NST 
+You can checkout the file src\fast_style_transfer.ipynb for example usage for both training and inference
+Or 
 ### Training the Model
 Download data
 You can use any images as content, I use the content images in the wikiart dataset in this link
@@ -16,7 +21,7 @@ Put the image files in the following folder:
 
 data/wikiart/
 
-To train the model, use the following command:
+ use the following command:
 
 GPU:
 ```bash
@@ -29,5 +34,3 @@ python src/train_script.py train --dataset data --save-model-dir model --checkpo
 ```
 
 ### Inference
-
-Currently: fast_style_transfer.ipynb
