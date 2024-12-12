@@ -113,18 +113,18 @@ class FastStyleTransferTrainer(StyleTransfer):
 
         
 
-    def stylize(self, content_image, preserve_color = False, return_tensor=True):
-        self.transformer.to(self.device).eval()
-        with torch.no_grad():
-            content_image = content_image.to(self.device)
-            stylized_image = self.transformer(content_image)
-            if stylized_image.max() > 100:
-                stylized_image = stylized_image/ 255.0
+    # def stylize(self, content_image, preserve_color = False, return_tensor=True):
+    #     self.transformer.to(self.device).eval()
+    #     with torch.no_grad():
+    #         content_image = content_image.to(self.device)
+    #         stylized_image = self.transformer(content_image)
+    #         if stylized_image.max() > 100:
+    #             stylized_image = stylized_image/ 255.0
 
-        if preserve_color:
-            stylized_image  = preserve_color_lab(content_image, stylized_image)
+    #     if preserve_color:
+    #         stylized_image  = preserve_color_lab(content_image, stylized_image)
 
-        if not return_tensor:
-            stylized_image = image_unloader(stylized_image)
+    #     if not return_tensor:
+    #         stylized_image = image_unloader(stylized_image)
 
-        return stylized_image
+    #     return stylized_image

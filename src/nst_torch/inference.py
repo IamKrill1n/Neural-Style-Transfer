@@ -17,12 +17,12 @@ class FastStyleTransfer:
         # self.transformer.load_state_dict(state_dict, strict=True)
         # self.transformer.eval()
 
-    def stylize(self, content_image, preserve_color = False, return_tensor=True):
+    def stylize(self, content_image, scale = True, preserve_color = False, return_tensor=True):
         with torch.no_grad():
             content_image = content_image.to(self.device)
             stylized_image = self.transformer(content_image)
             stylized_image.clamp_(0, 255)
-            if stylized_image.max() > 100:
+            if scale == True or stylized_image.max() > 100:
                 stylized_image = stylized_image / 255.0
 
         if preserve_color:
