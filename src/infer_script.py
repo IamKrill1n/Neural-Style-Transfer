@@ -6,7 +6,7 @@ import os
 def main():
     parser = argparse.ArgumentParser(description='Inference script')
     parser.add_argument('--content_img_path', type=str, required=True, help='Path to content image')
-    parser.add_argument('--style', type=str, required=True, choices=['mosaic', 'starry_night', 'sketch'], help='Trained style')
+    parser.add_argument('--style', type=str, required=True, choices=['mosaic', 'starry_night', 'sketch', 'monet'], help='Trained style')
     parser.add_argument('--output_img_path', type=str, required=True, help='Path to output image')
     parser.add_argument('--device', type=str, default='cuda', help='Device to use')
     parser.add_argument('--preserve_color', type=bool, default = False, help='Preserve color of content image')
