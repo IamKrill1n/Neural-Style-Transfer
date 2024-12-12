@@ -23,6 +23,7 @@ python src/original_style_transfer.py --content_img_path <path_to_content_image>
 ```
 
 ### Fast NST 
+
 #### Inference
 To perform style transfer on an image using a pre-trained model:
 ```bash
@@ -60,3 +61,15 @@ python src/train_script.py train --dataset data --save-model-dir model --checkpo
 ```
 
 For more args options checkout the source code
+
+#### Webcam Inference
+
+You will need to install open-cv for this
+```bash
+pip install opencv-python
+```
+
+Then run the following command:
+```bash
+python src/webcam_demo.py
+```
