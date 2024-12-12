@@ -39,20 +39,32 @@ def normalize_batch(batch):
     batch = batch.div_(255.0)
     return (batch - mean) / std
 
-def image_loader(image_path, imsize=DEFAULT_IMSIZE, device = device):
+def image_loader(image_path, imsize=DEFAULT_IMSIZE, device = device, scale=False):
     if not os.path.exists(image_path):
         raise FileNotFoundError(f"Image file not found: {image_path}")
     image = Image.open(image_path).convert('RGB')
     
+    if imsize == None:
+        imsize = image.size[1]
+
     if isinstance(imsize, int):
         width, height = image.size
         width *= imsize / height
         imsize = (imsize, int(width))
 
-    loader = transforms.Compose([
-        transforms.Resize(imsize),
-        transforms.ToTensor(),
-    ])
+    if not scale:
+        loader = transforms.Compose([
+            transforms.Resize(imsize),
+            transforms.ToTensor(),
+        ])
+    else:
+        loader = transforms.Compose([
+            transforms.Resize(imsize),
+            transforms.CenterCrop(imsize),
+            transforms.ToTensor(),
+            transforms.Lambda(lambda x: x.mul(255))
+        ])
+
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)
 
