@@ -34,7 +34,7 @@ python src/infer_script.py --content_img_path <path_to_content_image> --style <s
 
 To train the fast NST model, follow these steps:
 
-1. **Download the dataset**: You can use any images as content. For example, you can use the content images in the WikiArt dataset available here.
+1. **Download the dataset**: You can use any images as content. For example, you can use the content images in the WikiArt dataset available [here](https://www.kaggle.com/datasets/shaorrran/coco-wikiart-nst-dataset-512-100000?select=style)
 
 ```
 data/
