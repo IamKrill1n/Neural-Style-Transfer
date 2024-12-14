@@ -73,3 +73,11 @@ Then run the following command:
 ```bash
 python src/webcam_demo.py
 ```
+
+## Reference
+
+Original NST: [A Neural Algorithm of Artistic Style](https://arxiv.org/pdf/1508.06576)
+Fast NST: [Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://arxiv.org/pdf/1603.08155)
+          [Instance Normalization: The Missing Ingredient for Fast Stylization](https://arxiv.org/pdf/1607.08022)
+
+Code I found useful: [Pytorch example code](https://github.com/pytorch/examples/tree/main/fast_neural_style)
