@@ -1,0 +1,16 @@
+Scenario 3: Artistic Stylization
+
+Configuration:
+Style Layers: ['conv4_1', 'conv5_1'] (focus on capturing higher-level artistic patterns).
+Content Layers: ['conv4_1'] (emphasizes mid-to-high-level structure in the content image).
+Style Weights: [0.5, 1, 1.5, 2, 2.5] (progressively increasing weights, emphasizing more abstract features).
+TV Weight: 1e-3 (higher smoothing effect for more cohesive output).
+
+Effect on Output:
+Produces stylized outputs with more abstract, painterly effects by emphasizing higher-level style layers.
+Less focus on fine textures; instead, broader artistic patterns dominate.
+The higher TV weight ensures smooth transitions, resulting in a more cohesive and less noisy image.
+
+Insights:
+Suitable for creating artistic renditions where the style’s abstract and structural aspects take precedence over precise texture reproduction.
+Progressive style weights can enhance specific features, allowing for flexible emphasis on different aspects of the style.

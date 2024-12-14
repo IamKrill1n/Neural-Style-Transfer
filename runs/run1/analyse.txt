@@ -1,0 +1,16 @@
+Scenario 1: High Texture Fidelity
+
+Configuration:
+Style Layers: ['conv1_1', 'conv2_1', 'conv3_1'] (focus on capturing fine-grained texture details from lower CNN layers).
+Content Layers: ['conv3_1'] (mid-level content information).
+Style Weights: [2, 1.5, 1] (higher emphasis on the style details from the first layer).
+TV Weight: 1e-6 (low smoothing effect, retaining more texture details).
+
+Effect on Output:
+Produces high-detail textures, accurately reflecting intricate patterns from the style image.
+Prioritizes small, fine-grained details due to the higher weights for lower-level style layers (conv1_1).
+The low total variation weight means less smoothing, resulting in sharper textures but potentially noisier outputs.
+
+Insights:
+Best suited for applications where high-fidelity reproduction of surface patterns is desired.
+Extremely low TV weight may lead to outputs that are visually inconsistent or overly noisy.
