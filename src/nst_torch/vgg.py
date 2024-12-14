@@ -1,3 +1,6 @@
+# This code is based on the pytorch example code
+# https://github.com/pytorch/examples/tree/main/fast_neural_style
+
 from collections import namedtuple
 
 import torch

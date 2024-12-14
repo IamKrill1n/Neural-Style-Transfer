@@ -1,8 +1,10 @@
+# This code is based on the pytorch example code
+# https://github.com/pytorch/examples/tree/main/fast_neural_style
+
 import argparse
 import os
 import sys
 import time
-import re
 
 import numpy as np
 import torch
@@ -31,8 +33,6 @@ def check_paths(args):
 def train(args):
     if args.cuda:
         device = torch.device("cuda")
-    # elif args.mps:
-    #     device = torch.device("mps")
     else:
         device = torch.device("cpu")
 
@@ -124,66 +124,6 @@ def train(args):
 
     print("\nDone, trained model saved at", save_model_path)
 
-
-# def stylize(args):
-#     device = torch.device("cuda" if args.cuda else "cpu")
-
-#     content_image = utils.load_image(args.content_image, scale=args.content_scale)
-#     content_transform = transforms.Compose([
-#         transforms.ToTensor(),
-#         transforms.Lambda(lambda x: x.mul(255))
-#     ])
-#     content_image = content_transform(content_image)
-#     content_image = content_image.unsqueeze(0).to(device)
-
-#     if args.model.endswith(".onnx"):
-#         output = stylize_onnx(content_image, args)
-#     else:
-#         with torch.no_grad():
-#             style_model = TransformerNet()
-#             state_dict = torch.load(args.model)
-#             # remove saved deprecated running_* keys in InstanceNorm from the checkpoint
-#             for k in list(state_dict.keys()):
-#                 if re.search(r'in\d+\.running_(mean|var)$', k):
-#                     del state_dict[k]
-#             style_model.load_state_dict(state_dict)
-#             style_model.to(device)
-#             style_model.eval()
-#             if args.export_onnx:
-#                 assert args.export_onnx.endswith(".onnx"), "Export model file should end with .onnx"
-#                 output = torch.onnx._export(
-#                     style_model, content_image, args.export_onnx, opset_version=11,
-#                 ).cpu()            
-#             else:
-#                 output = style_model(content_image).cpu()
-#     utils.save_image(args.output_image, output[0])
-
-
-# def stylize_onnx(content_image, args):
-#     """
-#     Read ONNX model and run it using onnxruntime
-#     """
-
-#     assert not args.export_onnx
-
-#     import onnxruntime
-
-#     ort_session = onnxruntime.InferenceSession(args.model)
-
-#     def to_numpy(tensor):
-#         return (
-#             tensor.detach().cpu().numpy()
-#             if tensor.requires_grad
-#             else tensor.cpu().numpy()
-#         )
-
-#     ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(content_image)}
-#     ort_outs = ort_session.run(None, ort_inputs)
-#     img_out_y = ort_outs[0]
-
-#     return torch.from_numpy(img_out_y)
-
-
 def main():
     main_arg_parser = argparse.ArgumentParser(description="parser for fast-neural-style")
     subparsers = main_arg_parser.add_subparsers(title="subcommands", dest="subcommand")
@@ -221,21 +161,6 @@ def main():
     train_arg_parser.add_argument("--checkpoint-interval", type=int, default=2000,
                                   help="number of batches after which a checkpoint of the trained model will be created")
 
-    # eval_arg_parser = subparsers.add_parser("eval", help="parser for evaluation/stylizing arguments")
-    # eval_arg_parser.add_argument("--content-image", type=str, required=True,
-    #                              help="path to content image you want to stylize")
-    # eval_arg_parser.add_argument("--content-scale", type=float, default=None,
-    #                              help="factor for scaling down the content image")
-    # eval_arg_parser.add_argument("--output-image", type=str, required=True,
-    #                              help="path for saving the output image")
-    # eval_arg_parser.add_argument("--model", type=str, required=True,
-    #                              help="saved model to be used for stylizing the image. If file ends in .pth - PyTorch path is used, if in .onnx - Caffe2 path")
-    # eval_arg_parser.add_argument("--cuda", type=int, default=False,
-    #                              help="set it to 1 for running on cuda, 0 for CPU")
-    # eval_arg_parser.add_argument("--export_onnx", type=str,
-    #                              help="export ONNX model to a given file")
-    # eval_arg_parser.add_argument('--mps', action='store_true', default=False, help='enable macOS GPU training')
-
     args = main_arg_parser.parse_args()
 
     if args.subcommand is None:
@@ -244,15 +169,10 @@ def main():
     if args.cuda and not torch.cuda.is_available():
         print("ERROR: cuda is not available, try running on CPU")
         sys.exit(1)
-    # if not args.mps and torch.backends.mps.is_available():
-    #     print("WARNING: mps is available, run with --mps to enable macOS GPU")
 
     if args.subcommand == "train":
         check_paths(args)
         train(args)
-    # else:
-    #     stylize(args)
-
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,6 @@
 import torch
-
+# Model proposed in the paper "Perceptual Losses for Real-Time Style Transfer and Super-Resolution"
+# using Instance Normalization in "Instance Normalization: The Missing Ingredient for Fast Stylization"
 
 class TransformerNet(torch.nn.Module):
     def __init__(self):
