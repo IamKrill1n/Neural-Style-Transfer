@@ -22,6 +22,15 @@ You can check out the file `src/original_style_transfer.ipynb` for example usage
 python src/original_style_transfer.py --content_img_path <path_to_content_image> --style_img_path <path_to_style_image> --output_img_path <path_to_output_image>
 ```
 
+### Artist Model (PAPM method)
+You first need to download one of our pretrained model (for example 'PAPM_ukiyoe.model') from [this link here](https://husteduvn-my.sharepoint.com/:f:/g/personal/binh_nd225475_sis_hust_edu_vn/EiRV0jQp-ZhMoFTtUgXzjYABrcelOx1l4W2VEOtwpewF1Q?e=6BMUvk) and put it in the 'models' directory
+
+After that, you can use the following command to perform inference on all images from your directory:
+```bash
+python src/artist_style_transfer.py --input_dir <your-input-directory> --output_dir <your-output-directory> --style_name <style-name>
+```
+
+
 ### Fast NST 
 
 #### Inference
@@ -29,7 +38,6 @@ To perform style transfer on an image using a pre-trained model:
 ```bash
 python src/infer_script.py --content_img_path <path_to_content_image> --style <style_name> --output_img_path <path_to_output_image>
 ```
-
 
 #### Training the Model
 
