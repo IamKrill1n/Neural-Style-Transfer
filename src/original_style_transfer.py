@@ -16,7 +16,6 @@ from nst_torch.config import (
     DEFAULT_BETA,
     DEFAULT_TV_WEIGHT,
     DEFAULT_PRESERVE_COLOR,
-    DEFAULT_RETURN_TENSOR
 )
 
 def main():
@@ -31,7 +30,6 @@ def main():
     parser.add_argument('--beta', type=float, default=DEFAULT_BETA, help='Style weight')
     parser.add_argument('--tv_weight', type=float, default=DEFAULT_TV_WEIGHT, help='Total variation weight')
     parser.add_argument('--preserve_color', action='store_true', default=DEFAULT_PRESERVE_COLOR, help='Preserve color of the content image')
-    parser.add_argument('--return_tensor', action='store_true', default=DEFAULT_RETURN_TENSOR, help='Return tensor instead of image')
     parser.add_argument('--output_img_path', type=str, default = 'output_images', help='Output image path')
     # Arguments for StyleTransfer initialization
     parser.add_argument('--cnn', type=str, choices=['vgg16', 'vgg19'], default=DEFAULT_CNN, help='CNN model to use')
@@ -61,14 +59,10 @@ def main():
         alpha=args.alpha,
         beta=args.beta,
         tv_weight=args.tv_weight,
-        preserve_color=args.preserve_color,
-        return_tensor=args.return_tensor
+        preserve_color=args.preserve_color
     )
 
-    if not args.return_tensor:
-        output.save(os.path.join(args.output_img_path, 'output.png'))
-    else:
-        print("Output is a tensor. Cannot save as image.")
+    output.save(os.path.join(args.output_img_path, 'output.png'))
 
 if __name__ == '__main__':
     main()
