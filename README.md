@@ -84,8 +84,22 @@ python src/webcam_demo.py
 
 ## Reference
 
-Original NST: [A Neural Algorithm of Artistic Style](https://arxiv.org/pdf/1508.06576)
-Fast NST: [Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://arxiv.org/pdf/1603.08155)
-          [Instance Normalization: The Missing Ingredient for Fast Stylization](https://arxiv.org/pdf/1607.08022)
+- [Evaluation in Neural Style Transfer: A Review](https://doi.org/10.48550/arXiv.2401.17109) by Eleftherios Ioannou and Steve Maddock (2024).
 
-Code I found useful: [Pytorch example code](https://github.com/pytorch/examples/tree/main/fast_neural_style)
+- [A neural algorithm of artistic style](https://doi.org/10.1167/16.12.326) by Gatys, L., Ecker, A., & Bethge, M. (2016). Journal of Vision, 16(12), 326.
+
+- [Perceptual Losses for Real-Time Style Transfer and Super-Resolution](https://doi.org/10.1007/978-3-319-46475-6_43) by Johnson, J., Alahi, A., & Fei-Fei, L. (2016). Lecture notes in computer science, pp. 694–711.
+
+- [Unpaired Image-to-Image Translation Using Cycle-Consistent Adversarial Networks](https://doi.org/10.1109/iccv.2017.244) by Zhu, J., Park, T., Isola, P., & Efros, A. A. (2017). ICCV 2017, pp. 2242–2251.
+
+- [Neural Style Transfer: A Review](https://doi.org/10.1109/tvcg.2019.2921336) by Jing, Y., Yang, Y., Feng, Z., Ye, J., Yu, Y., & Song, M. (2019). IEEE Transactions on Visualization and Computer Graphics, 26(11), 3365–3385.
+
+- [Instance Normalization: The Missing Ingredient for Fast Stylization](https://doi.org/10.48550/arxiv.1607.08022) by Ulyanov, D., Vedaldi, A., & Lempitsky, V. S. (2016).
+
+- [Multi-head Mutual-attention CycleGAN for Unpaired Image-to-Image Translation](https://doi.org/10.1049/iet-ipr.2019.1153) by Ji, Wei, Guo, Jing, & Li, Yun. (2020). IET Image Processing.
+
+Code we found useful: 
+
+- [Pytorch example code](https://github.com/pytorch/examples/tree/main/fast_neural_style)
+  
+- [CycleGAN notebook](https://github.com/henry32144/cyclegan-notebook.git)
