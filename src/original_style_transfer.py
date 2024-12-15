@@ -1,4 +1,5 @@
 import argparse
+import os
 from nst_torch.style_transfer import StyleTransfer
 from nst_torch.config import (
     DEFAULT_CNN,
@@ -31,7 +32,7 @@ def main():
     parser.add_argument('--tv_weight', type=float, default=DEFAULT_TV_WEIGHT, help='Total variation weight')
     parser.add_argument('--preserve_color', action='store_true', default=DEFAULT_PRESERVE_COLOR, help='Preserve color of the content image')
     parser.add_argument('--return_tensor', action='store_true', default=DEFAULT_RETURN_TENSOR, help='Return tensor instead of image')
-    parser.add_argument('--output_img_path', type=str, required=True, help='Output image path')
+    parser.add_argument('--output_img_path', type=str, default = 'output_images', help='Output image path')
     # Arguments for StyleTransfer initialization
     parser.add_argument('--cnn', type=str, choices=['vgg16', 'vgg19'], default=DEFAULT_CNN, help='CNN model to use')
     parser.add_argument('--content_layers', nargs='+', default=DEFAULT_CONTENT_LAYERS, help='Content layers')
@@ -65,7 +66,7 @@ def main():
     )
 
     if not args.return_tensor:
-        output.save(args.output_img_path)
+        output.save(os.path.join(args.output_img_path, 'output.png'))
     else:
         print("Output is a tensor. Cannot save as image.")
 
