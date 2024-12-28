@@ -30,7 +30,7 @@ def main():
     parser.add_argument('--beta', type=float, default=DEFAULT_BETA, help='Style weight')
     parser.add_argument('--tv_weight', type=float, default=DEFAULT_TV_WEIGHT, help='Total variation weight')
     parser.add_argument('--preserve_color', action='store_true', default=DEFAULT_PRESERVE_COLOR, help='Preserve color of the content image')
-    parser.add_argument('--output_img_path', type=str, default = 'output_images', help='Output image path')
+    parser.add_argument('--output_img_path', type=str, default = 'output_images/output.png', help='Output image path')
     # Arguments for StyleTransfer initialization
     parser.add_argument('--cnn', type=str, choices=['vgg16', 'vgg19'], default=DEFAULT_CNN, help='CNN model to use')
     parser.add_argument('--content_layers', nargs='+', default=DEFAULT_CONTENT_LAYERS, help='Content layers')
@@ -62,7 +62,7 @@ def main():
         preserve_color=args.preserve_color
     )
 
-    output.save(os.path.join(args.output_img_path, 'output.png'))
+    output.save(args.output_img_path)
 
 if __name__ == '__main__':
     main()

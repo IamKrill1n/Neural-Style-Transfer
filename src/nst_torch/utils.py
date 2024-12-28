@@ -44,7 +44,7 @@ def image_loader(image_path, imsize=DEFAULT_IMSIZE, device = device, scale=False
         raise FileNotFoundError(f"Image file not found: {image_path}")
     image = Image.open(image_path).convert('RGB')
     
-    if imsize == None:
+    if imsize == None or imsize == -1:
         imsize = image.size[1]
 
     if isinstance(imsize, int):
