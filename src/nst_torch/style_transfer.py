@@ -4,6 +4,7 @@ from .utils import image_loader, image_unloader, preserve_color_lab, preserve_co
 from .config import *
 from .perceptual_loss_net import Vgg16, Vgg19
 from .loss import content_loss, style_loss, total_variation_loss
+import time
 
 class StyleTransfer:
     def __init__(self, cnn = DEFAULT_CNN, content_layers = DEFAULT_CONTENT_LAYERS, style_layers = DEFAULT_STYLE_LAYERS, content_weights = DEFAULT_CONTENT_WEIGHTS, style_weights = DEFAULT_STYLE_WEIGHTS, optimizer = DEFAULT_OPTIMIZER):
@@ -21,6 +22,7 @@ class StyleTransfer:
         self.content_weights = content_weights
         self.style_weights = style_weights
         self.optimizer = optimizer
+        self.losses = []
 
     def get_optimizer(self, input_img, learning_rate=None):
         if learning_rate is None:
@@ -77,6 +79,7 @@ class StyleTransfer:
 
         print('Optimizing...')
         run = [0]
+        start_time = time.time()    
         while run[0] <= num_steps:
 
             def closure():
@@ -98,9 +101,11 @@ class StyleTransfer:
                 loss.backward()
 
                 run[0] += 1
-                if run[0] % 50 == 0:
+                if run[0] % 100 == 0:
                     print("Step {}: Style Loss: {:4f} Content Loss: {:4f}".format(
                         run[0], style_score.item(), content_score.item()))
+                    print('Time elapsed: ', time.time() - start_time)
+                    self.losses.append(loss.item())
                 return loss
 
             optimizer.step(closure)
@@ -116,3 +121,6 @@ class StyleTransfer:
             input_img = image_unloader(input_img)
 
         return input_img
+    
+    def get_losses(self):
+        return self.losses

@@ -17,7 +17,7 @@ from nst_torch.config import (
     DEFAULT_TV_WEIGHT,
     DEFAULT_PRESERVE_COLOR,
 )
-
+import time
 def main():
     parser = argparse.ArgumentParser(description='Style Transfer Script')
     parser.add_argument('--content_img_path', type=str, required=True, help='Path to the content image')
@@ -49,6 +49,8 @@ def main():
         style_weights=args.style_weights,
         optimizer=args.optimizer
     )
+
+    start_time = time.time()
     output = st.stylize(
         content_img_path=args.content_img_path,
         style_img_path=args.style_img_path,
@@ -61,7 +63,7 @@ def main():
         tv_weight=args.tv_weight,
         preserve_color=args.preserve_color
     )
-
+    print('Inference time: ', time.time() - start_time)
     output.save(args.output_img_path)
 
 if __name__ == '__main__':
